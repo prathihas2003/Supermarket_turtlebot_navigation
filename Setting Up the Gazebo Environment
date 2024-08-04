@@ -1,0 +1,78 @@
+# Install Required Software
+Ensure you have ROS and Gazebo installed. For this guide, ROS Noetic and Gazebo 11 are used. Follow the installation instructions for ROS Noetic and Gazebo 11.
+
+#Create and navigate to your ROS workspace
+mkdir -p ~/catkin_ws/src
+cd ~/catkin_ws/src
+catkin_init_workspace
+
+#Create a new ROS package for the Gazebo simulation:
+cd ~/catkin_ws/src
+catkin_create_pkg supermarket_gazebo rospy std_msgs gazebo_ros
+cd supermarket_gazebo
+
+mkdir world
+<sdf version='1.6'>
+  <world name='default'>
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <include>
+      <uri>model://turtlebot3_burger</uri>
+    </include>
+    <!-- Add supermarket models here -->
+    <model name='shelf1'>
+      <pose>2 0 0 0 0 0</pose>
+      <link name='link'>
+        <collision name='collision'>
+          <geometry>
+            <box>
+              <size>1 0.2 0.5</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>1 0.2 0.5</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+    <model name='shelf2'>
+      <pose>0 2 0 0 0 0</pose>
+      <link name='link'>
+        <collision name='collision'>
+          <geometry>
+            <box>
+              <size>1 0.2 0.5</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size>1 0.2 0.5</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+  </world>
+</sdf>
+
+mkdir launch
+<launch>
+  <arg name="world_file" default="$(find supermarket_gazebo)/world/supermarket.world"/>
+  <param name="use_sim_time" value="true"/>
+  <node pkg="gazebo_ros" type="gazebo" name="gazebo" args="-s libgazebo_ros_factory.so --verbose $(arg world_file)" output="screen"/>
+</launch>
+
+cd ~/catkin_ws
+catkin_make
+source devel/setup.bash
+
